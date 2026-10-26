@@ -8,7 +8,7 @@ app = FastAPI()
 db = Database(sqlite3.connect("notes.db", check_same_thread=False))
 
 @app.get("/api/notes")
-def get_notes(id_user: str | None = Query(None)):
+def get_notes(id_user: str | None = Query(None), error : bool = False):
     """Список заметок. 200 — ок, 400 — плохой параметр, 500 — сбой сервера."""
     if id_user and not id_user.isdigit():
         return JSONResponse(status_code=400, content={"error": "Параметр id_user должен быть целым числом"})
@@ -22,6 +22,9 @@ def get_notes(id_user: str | None = Query(None)):
             sql += f"""WHERE notes.id_user = {int(id_user)}"""
         
         rows = db.query(sql)
+
+        if error:
+             raise Exception()
         
         resp_arr = []
         for row in rows:
